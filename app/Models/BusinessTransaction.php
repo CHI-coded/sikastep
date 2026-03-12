@@ -9,18 +9,15 @@ class BusinessTransaction extends Model
 {
     use HasFactory;
 
-    protected $table = 'business_transactions';
-
-    protected $fillable = [
-        'user_id',
-        'description',
-        'amount',
-        'type',
-        'transaction_date',
-    ];
+    protected $fillable = ['user_id', 'description', 'amount', 'transaction_date'];
 
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function businessProfitTrackers()
+    {
+        return $this->hasMany(BusinessProfitTracker::class);
     }
 }

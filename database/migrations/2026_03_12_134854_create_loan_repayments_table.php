@@ -10,12 +10,10 @@ return new class extends Migration
     {
         Schema::create('loan_repayments', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('loan_request_id');
+            $table->foreignId('loan_request_id')->constrained('loan_requests')->onDelete('cascade');
             $table->decimal('amount', 10, 2);
             $table->date('repayment_date');
             $table->timestamps();
-
-            $table->foreign('loan_request_id')->references('id')->on('loan_requests')->onDelete('cascade');
         });
     }
 

@@ -10,14 +10,11 @@ return new class extends Migration
     {
         Schema::create('business_transactions', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('description');
             $table->decimal('amount', 10, 2);
-            $table->string('type'); // income or expense
             $table->date('transaction_date');
             $table->timestamps();
-
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

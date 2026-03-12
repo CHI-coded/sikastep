@@ -9,13 +9,7 @@ class LoanRepayment extends Model
 {
     use HasFactory;
 
-    protected $table = 'loan_repayments';
-
-    protected $fillable = [
-        'loan_request_id',
-        'amount',
-        'repayment_date',
-    ];
+    protected $fillable = ['loan_request_id', 'amount', 'repayment_date'];
 
     public function loanRequest()
     {

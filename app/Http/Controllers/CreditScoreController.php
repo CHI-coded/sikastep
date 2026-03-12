@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\CreditScore;
+use Illuminate\Http\Request;
 
 class CreditScoreController extends Controller
 {
@@ -14,25 +14,12 @@ class CreditScoreController extends Controller
 
     public function store(Request $request)
     {
-        return CreditScore::create($request->all());
-    }
+        $validated = $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'score' => 'required|numeric|min:0|max:1000',
+        ]);
 
-    public function show($id)
-    {
-        return CreditScore::findOrFail($id);
-    }
-
-    public function update(Request $request, $id)
-    {
-        $score = CreditScore::findOrFail($id);
-        $score->update($request->all());
-
-        return $score;
-    }
-
-    public function destroy($id)
-    {
-        CreditScore::destroy($id);
-        return response()->json(['message' => 'Credit score deleted']);
+        $score = CreditScore::create($validated);
+        return response()->json($score, 201);
     }
 }

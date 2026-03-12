@@ -10,13 +10,11 @@ return new class extends Migration
     {
         Schema::create('loan_requests', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->decimal('amount', 10, 2);
-            $table->string('status')->default('pending'); // pending, approved, declined
-            $table->text('notes')->nullable();
+            $table->enum('status', ['pending', 'approved', 'rejected']);
+            $table->date('due_date'); // make sure this exists to fix seed error
             $table->timestamps();
-
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

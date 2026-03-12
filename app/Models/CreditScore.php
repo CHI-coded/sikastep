@@ -9,13 +9,7 @@ class CreditScore extends Model
 {
     use HasFactory;
 
-    protected $table = 'credit_scores';
-
-    protected $fillable = [
-        'user_id',
-        'score',
-        'tier',
-    ];
+    protected $fillable = ['user_id', 'score'];
 
     public function user()
     {

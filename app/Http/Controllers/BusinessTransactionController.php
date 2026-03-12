@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\BusinessTransaction;
+use Illuminate\Http\Request;
 
 class BusinessTransactionController extends Controller
 {
@@ -14,25 +14,14 @@ class BusinessTransactionController extends Controller
 
     public function store(Request $request)
     {
-        return BusinessTransaction::create($request->all());
-    }
+        $validated = $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'description' => 'required|string|max:255',
+            'amount' => 'required|numeric',
+            'transaction_date' => 'required|date',
+        ]);
 
-    public function show($id)
-    {
-        return BusinessTransaction::findOrFail($id);
-    }
-
-    public function update(Request $request, $id)
-    {
-        $transaction = BusinessTransaction::findOrFail($id);
-        $transaction->update($request->all());
-
-        return $transaction;
-    }
-
-    public function destroy($id)
-    {
-        BusinessTransaction::destroy($id);
-        return response()->json(['message' => 'Business transaction deleted']);
+        $transaction = BusinessTransaction::create($validated);
+        return response()->json($transaction, 201);
     }
 }

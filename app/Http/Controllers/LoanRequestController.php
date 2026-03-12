@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\LoanRequest;
+use Illuminate\Http\Request;
 
 class LoanRequestController extends Controller
 {
@@ -14,25 +14,14 @@ class LoanRequestController extends Controller
 
     public function store(Request $request)
     {
-        return LoanRequest::create($request->all());
-    }
+        $validated = $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'amount' => 'required|numeric|min:1',
+            'status' => 'required|string|max:50',
+            'due_date' => 'required|date',
+        ]);
 
-    public function show($id)
-    {
-        return LoanRequest::findOrFail($id);
-    }
-
-    public function update(Request $request, $id)
-    {
-        $loan = LoanRequest::findOrFail($id);
-        $loan->update($request->all());
-
-        return $loan;
-    }
-
-    public function destroy($id)
-    {
-        LoanRequest::destroy($id);
-        return response()->json(['message' => 'Loan request deleted']);
+        $loan = LoanRequest::create($validated);
+        return response()->json($loan, 201);
     }
 }

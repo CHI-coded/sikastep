@@ -9,17 +9,15 @@ class BusinessProfitTracker extends Model
 {
     use HasFactory;
 
-    protected $table = 'business_profit_tracker';
-
-    protected $fillable = [
-        'user_id',
-        'total_income',
-        'total_expense',
-        'profit',
-    ];
+    protected $fillable = ['user_id', 'business_transaction_id', 'profit_amount'];
 
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function businessTransaction()
+    {
+        return $this->belongsTo(BusinessTransaction::class);
     }
 }

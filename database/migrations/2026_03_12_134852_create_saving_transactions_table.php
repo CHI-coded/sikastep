@@ -10,12 +10,10 @@ return new class extends Migration
     {
         Schema::create('saving_transactions', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('saving_goal_id');
+            $table->foreignId('saving_goal_id')->constrained('saving_goals')->onDelete('cascade');
             $table->decimal('amount', 10, 2);
             $table->date('transaction_date');
             $table->timestamps();
-
-            $table->foreign('saving_goal_id')->references('id')->on('saving_goals')->onDelete('cascade');
         });
     }
 

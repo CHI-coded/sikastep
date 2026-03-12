@@ -9,21 +9,14 @@ class LoanRequest extends Model
 {
     use HasFactory;
 
-    protected $table = 'loan_requests';
-
-    protected $fillable = [
-        'user_id',
-        'amount',
-        'status',
-        'notes',
-    ];
+    protected $fillable = ['user_id', 'amount', 'status', 'due_date'];
 
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    public function repayments()
+    public function loanRepayments()
     {
         return $this->hasMany(LoanRepayment::class);
     }

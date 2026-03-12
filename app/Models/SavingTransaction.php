@@ -9,13 +9,7 @@ class SavingTransaction extends Model
 {
     use HasFactory;
 
-    protected $table = 'saving_transactions';
-
-    protected $fillable = [
-        'saving_goal_id',
-        'amount',
-        'transaction_date',
-    ];
+    protected $fillable = ['saving_goal_id', 'amount', 'transaction_date'];
 
     public function savingGoal()
     {

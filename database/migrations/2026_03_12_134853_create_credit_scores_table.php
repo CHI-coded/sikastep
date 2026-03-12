@@ -10,12 +10,9 @@ return new class extends Migration
     {
         Schema::create('credit_scores', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');
-            $table->integer('score')->default(0);
-            $table->string('tier')->default('Bronze'); // Bronze, Silver, Gold, Platinum
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->integer('score'); // 300–850
             $table->timestamps();
-
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

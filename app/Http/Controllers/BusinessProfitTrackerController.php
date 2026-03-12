@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\BusinessProfitTracker;
+use Illuminate\Http\Request;
 
 class BusinessProfitTrackerController extends Controller
 {
@@ -14,25 +14,13 @@ class BusinessProfitTrackerController extends Controller
 
     public function store(Request $request)
     {
-        return BusinessProfitTracker::create($request->all());
-    }
+        $validated = $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'business_transaction_id' => 'required|exists:business_transactions,id',
+            'profit_amount' => 'required|numeric',
+        ]);
 
-    public function show($id)
-    {
-        return BusinessProfitTracker::findOrFail($id);
-    }
-
-    public function update(Request $request, $id)
-    {
-        $profit = BusinessProfitTracker::findOrFail($id);
-        $profit->update($request->all());
-
-        return $profit;
-    }
-
-    public function destroy($id)
-    {
-        BusinessProfitTracker::destroy($id);
-        return response()->json(['message' => 'Profit record deleted']);
+        $profit = BusinessProfitTracker::create($validated);
+        return response()->json($profit, 201);
     }
 }

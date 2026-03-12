@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\LoanRepayment;
+use Illuminate\Http\Request;
 
 class LoanRepaymentController extends Controller
 {
@@ -14,25 +14,13 @@ class LoanRepaymentController extends Controller
 
     public function store(Request $request)
     {
-        return LoanRepayment::create($request->all());
-    }
+        $validated = $request->validate([
+            'loan_request_id' => 'required|exists:loan_requests,id',
+            'amount' => 'required|numeric|min:1',
+            'repayment_date' => 'required|date',
+        ]);
 
-    public function show($id)
-    {
-        return LoanRepayment::findOrFail($id);
-    }
-
-    public function update(Request $request, $id)
-    {
-        $repayment = LoanRepayment::findOrFail($id);
-        $repayment->update($request->all());
-
-        return $repayment;
-    }
-
-    public function destroy($id)
-    {
-        LoanRepayment::destroy($id);
-        return response()->json(['message' => 'Repayment deleted']);
+        $repayment = LoanRepayment::create($validated);
+        return response()->json($repayment, 201);
     }
 }

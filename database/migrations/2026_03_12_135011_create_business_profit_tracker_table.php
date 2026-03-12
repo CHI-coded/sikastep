@@ -8,20 +8,17 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('business_profit_tracker', function (Blueprint $table) {
+        Schema::create('business_profit_trackers', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');
-            $table->decimal('total_income', 12, 2)->default(0);
-            $table->decimal('total_expense', 12, 2)->default(0);
-            $table->decimal('profit', 12, 2)->default(0);
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('business_transaction_id')->constrained('business_transactions')->onDelete('cascade');
+            $table->decimal('profit_amount', 10, 2);
             $table->timestamps();
-
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('business_profit_tracker');
+        Schema::dropIfExists('business_profit_trackers');
     }
 };
