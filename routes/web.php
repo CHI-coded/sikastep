@@ -21,8 +21,9 @@ use App\Http\Controllers\BusinessProfitTrackerController;
 */
 
 
+
 Route::get('/', function () {
-    return "SikaStep Backend Running";
+    return file_get_contents(public_path('index.html'));
 });
 
 
