@@ -7,13 +7,11 @@ use Illuminate\Http\Request;
 
 class SavingGoalController extends Controller
 {
-    // Get all saving goals
     public function index()
     {
         return SavingGoal::all();
     }
 
-    // Store new saving goal
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -24,8 +22,31 @@ class SavingGoalController extends Controller
         ]);
 
         $goal = SavingGoal::create($validated);
-
         return response()->json($goal, 201);
     }
 
+    public function show($id)
+    {
+        return SavingGoal::findOrFail($id);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $goal = SavingGoal::findOrFail($id);
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'target_amount' => 'required|numeric|min:1',
+            'deadline' => 'required|date',
+        ]);
+
+        $goal->update($validated);
+        return response()->json($goal);
+    }
+
+    public function destroy($id)
+    {
+        SavingGoal::destroy($id);
+        return response()->json(['message' => 'Deleted successfully']);
+    }
 }

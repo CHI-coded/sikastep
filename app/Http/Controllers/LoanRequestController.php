@@ -17,11 +17,34 @@ class LoanRequestController extends Controller
         $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
             'amount' => 'required|numeric|min:1',
-            'status' => 'required|string|max:50',
-            'due_date' => 'required|date',
+            'status' => 'required|string',
         ]);
 
         $loan = LoanRequest::create($validated);
         return response()->json($loan, 201);
+    }
+
+    public function show($id)
+    {
+        return LoanRequest::findOrFail($id);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $loan = LoanRequest::findOrFail($id);
+
+        $validated = $request->validate([
+            'amount' => 'required|numeric|min:1',
+            'status' => 'required|string',
+        ]);
+
+        $loan->update($validated);
+        return response()->json($loan);
+    }
+
+    public function destroy($id)
+    {
+        LoanRequest::destroy($id);
+        return response()->json(['message' => 'Deleted successfully']);
     }
 }
