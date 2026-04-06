@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('saving_goals', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->string('title');
+            $table->string('name');  // Changed from 'title' to 'name'
             $table->decimal('target_amount', 10, 2);
             $table->date('deadline');
             $table->timestamps();

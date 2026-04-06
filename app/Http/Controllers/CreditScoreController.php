@@ -16,33 +16,29 @@ class CreditScoreController extends Controller
     {
         $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
-            'score' => 'required|numeric',
+            'score' => 'required|numeric|min:0|max:1000',
         ]);
 
         $score = CreditScore::create($validated);
         return response()->json($score, 201);
     }
 
-    public function show($id)
-    {
-        return CreditScore::findOrFail($id);
-    }
-
     public function update(Request $request, $id)
     {
         $score = CreditScore::findOrFail($id);
-
+        
         $validated = $request->validate([
-            'score' => 'required|numeric',
+            'score' => 'sometimes|numeric|min:0|max:1000',
         ]);
-
+        
         $score->update($validated);
         return response()->json($score);
     }
 
     public function destroy($id)
     {
-        CreditScore::destroy($id);
+        $score = CreditScore::findOrFail($id);
+        $score->delete();
         return response()->json(['message' => 'Deleted successfully']);
     }
 }
