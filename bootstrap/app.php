@@ -3,7 +3,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use App\Http\Middleware\Cors;  // ADD THIS LINE
+use App\Http\Middleware\Cors;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -13,8 +13,13 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // ADD THIS BLOCK
         $middleware->append(Cors::class);
+        $middleware->api(append: [
+            \Illuminate\Session\Middleware\StartSession::class,
+        ]);
+        $middleware->web(append: [
+            \Illuminate\Session\Middleware\StartSession::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

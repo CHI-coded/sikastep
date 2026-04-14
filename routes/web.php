@@ -2,41 +2,29 @@
 
 use Illuminate\Support\Facades\Route;
 
-use App\Http\Controllers\SavingGoalController;
-use App\Http\Controllers\SavingTransactionController;
-use App\Http\Controllers\LoanRequestController;
-use App\Http\Controllers\CreditScoreController;
-use App\Http\Controllers\LoanRepaymentController;
-use App\Http\Controllers\BusinessTransactionController;
-use App\Http\Controllers\BusinessProfitTrackerController;
-
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application.
-|
 */
 
-
-
+// Serve your frontend application for the root URL
 Route::get('/', function () {
-    return file_get_contents(public_path('index.html'));
+    return response()->file(public_path('index.html'));
 });
 
 
-Route::resource('saving-goals', SavingGoalController::class);
+Route::get('/test-session', function() {
+    if (Auth::check()) {
+        return response()->json([
+            'logged_in' => true,
+            'user_id' => Auth::id(),
+            'session_id' => session()->getId()
+        ]);
+    }
+    return response()->json(['logged_in' => false]);
+});
 
-Route::resource('saving-transactions', SavingTransactionController::class);
-
-Route::resource('loan-requests', LoanRequestController::class);
-
-Route::resource('credit-scores', CreditScoreController::class);
-
-Route::resource('loan-repayments', LoanRepaymentController::class);
-
-Route::resource('business-transactions', BusinessTransactionController::class);
-
-Route::resource('business-profit', BusinessProfitTrackerController::class);
+// DO NOT add any catch-all routes here
+// API routes are handled by routes/api.php
+// Static files (CSS, JS, images) are handled by the web server

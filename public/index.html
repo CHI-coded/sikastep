@@ -1048,33 +1048,28 @@ function doSignup(){
 }
 
 function doLogin(){
+  console.log("🔵 doLogin function was CALLED!");
+  
   const em = document.getElementById('l-em').value;
   const pw = document.getElementById('l-pw').value;
+  
+  console.log("Email:", em);
+  console.log("Password entered:", pw ? "yes" : "no");
   
   if(!em || !pw){
     toast('Please enter your email and password','error');
     return;
   }
   
-  // Show loading state
-  const btn = event.target;
-  const originalText = btn.innerHTML;
-  btn.innerHTML = 'Logging in...';
-  btn.disabled = true;
-  
   fetch(BASE + '/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
     body: JSON.stringify({email: em, password: pw})
   })
-  .then(res => {
-    if(!res.ok){
-      return res.json().then(err => { throw err; });
-    }
-    return res.json();
-  })
+  .then(res => res.json())
   .then(data => {
-    console.log('Login successful:', data);
+    console.log("Response:", data);
     
     if(data && data.user && data.user.id){
       USER_ID = data.user.id;
@@ -1083,19 +1078,13 @@ function doLogin(){
       show('app');
       go('dashboard');
       toast('Welcome back, ' + USER.name + '!','success');
-      
-      // Clear form
-      document.getElementById('l-em').value = '';
-      document.getElementById('l-pw').value = '';
+    } else {
+      toast('Login failed - invalid credentials','error');
     }
   })
   .catch(err => {
     console.error('Login error:', err);
-    toast('Login failed: Invalid email or password', 'error');
-  })
-  .finally(() => {
-    btn.innerHTML = originalText;
-    btn.disabled = false;
+    toast('Login failed: ' + err.message, 'error');
   });
 }
 
@@ -1116,12 +1105,12 @@ function setUI(){
   if(av && USER.full) av.textContent=USER.full.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
 }
 
-/* ─── API WITH BETTER ERROR HANDLING ─── */
 async function api(ep, opts={}){
   try{
     console.log('API Call:', BASE+ep, opts.method || 'GET');
     const response = await fetch(BASE+ep, {
       headers: HDR,
+      credentials: 'include',  // ADD THIS LINE - important for sessions
       ...opts,
       body: opts.body ? opts.body : undefined
     });
