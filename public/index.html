@@ -339,6 +339,69 @@ button,input,select{font-family:inherit;font-size:14px}
 .ss-label{font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
 .ss-val{font-size:18px;font-weight:800;color:var(--t)}
 
+/* ADMIN PANEL STYLES */
+.admin-tab {
+    background: transparent;
+    border: none;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--t2);
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+.admin-tab:hover {
+    background: var(--gl);
+    color: var(--g);
+}
+.admin-tab.active {
+    background: var(--gd);
+    color: white;
+}
+.filter-btn {
+    background: transparent;
+    border: 1.5px solid var(--b);
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-left: 8px;
+}
+.filter-btn.active {
+    background: var(--gd);
+    border-color: var(--gd);
+    color: white;
+}
+.admin-action-btn {
+    padding: 4px 8px;
+    font-size: 11px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    margin: 0 2px;
+}
+.btn-approve { background: #10b981; color: white; }
+.btn-reject { background: #ef4444; color: white; }
+.btn-make-admin { background: #3b82f6; color: white; }
+.btn-suspend { background: #f59e0b; color: white; }
+.status-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+}
+.status-active { background: #d1fae5; color: #065f46; }
+.status-suspended { background: #fee2e2; color: #991b1b; }
+.role-admin { background: #e0e7ff; color: #3730a3; }
+.role-user { background: #f3f4f6; color: #4b5563; }
+.status-approved { background: #d1fae5; color: #065f46; }
+.status-pending { background: #fef3c7; color: #92400e; }
+.status-rejected { background: #fee2e2; color: #991b1b; }
+.admin-tab-content { display: block; }
+
 /* RESPONSIVE */
 @media(max-width:960px){
   #sb{transform:translateX(-240px);width:240px}
@@ -604,8 +667,9 @@ input:focus-visible{outline:none}
       <div style="overflow-x:auto">
         <table class="tbl">
           <thead><tr><th>Goal</th><th>Target</th><th>Saved</th><th>Progress</th><th>Deadline</th><th>Actions</th></tr></thead>
-          <tbody id="sg-tb"><tr><td colspan="6"><div class="spin-wrap"><div class="spin"></div>Loading...</div></td></tr></tbody>
-        </table>
+          <tbody id="sg-tb"><tr><td colspan="6"><div class="spin-wrap"><div class="spin"></div>Loading...</div></td></tr>
+        </tbody>
+      </table>
       </div>
     </div>
   </div>
@@ -655,8 +719,9 @@ input:focus-visible{outline:none}
       <div style="overflow-x:auto">
         <table class="tbl">
           <thead><tr><th>Amount</th><th>Purpose</th><th>Status</th><th>Applied On</th><th>Due Date</th></tr></thead>
-          <tbody id="ln-tb"><tr><td colspan="5"><div class="spin-wrap"><div class="spin"></div>Loading...</div></td></tr></tbody>
-        </table>
+          <tbody id="ln-tb"><tr><td colspan="5"><div class="spin-wrap"><div class="spin"></div>Loading...</div></td></tr>
+        </tbody>
+      </table>
       </div>
     </div>
   </div>
@@ -716,8 +781,9 @@ input:focus-visible{outline:none}
       <div style="overflow-x:auto">
         <table class="tbl">
           <thead><tr><th>Date</th><th>Description</th><th>Type</th><th>Amount</th><th>Actions</th></tr></thead>
-          <tbody id="biz-tb"><tr><td colspan="5"><div class="spin-wrap"><div class="spin"></div>Loading...</div></td></tr></tbody>
-        </table>
+          <tbody id="biz-tb"><tr><td colspan="5"><div class="spin-wrap"><div class="spin"></div>Loading...</div></td></tr>
+        </tbody>
+       </table>
       </div>
     </div>
   </div>
@@ -783,6 +849,131 @@ input:focus-visible{outline:none}
       <div class="pc"><div class="pico pig"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#166534" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div><p class="pt">Good Practices</p><ul><li>Regular savings deposits</li><li>On-time loan payments</li><li>Maintaining active goals</li><li>Low credit utilization</li></ul></div>
       <div class="pc"><div class="pico piy"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#92400e" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r=".8" fill="#92400e"/></svg></div><p class="pt">Watch Out For</p><ul><li>Missed payments</li><li>Multiple loan requests</li><li>Irregular savings</li><li>High debt ratio</li></ul></div>
       <div class="pc"><div class="pico pip"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6d28d9" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><p class="pt">Build Credit</p><ul><li>Save consistently</li><li>Complete savings goals</li><li>Repay loans on time</li><li>Build payment history</li></ul></div>
+    </div>
+  </div>
+
+  <!-- ADMIN PANEL -->
+  <div id="pg-admin" class="pg">
+    <div class="ph">
+      <div>
+        <h2>Admin Dashboard</h2>
+        <p class="psub">Manage users, loans, and monitor system activity</p>
+      </div>
+      <button class="btn bo" onclick="refreshAdminData()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="23 4 23 10 17 10"/>
+          <polyline points="1 20 1 14 7 14"/>
+          <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
+        </svg>
+        Refresh
+      </button>
+    </div>
+
+    <!-- Stats Cards -->
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px;">
+      <div class="card" style="background: linear-gradient(135deg, #1a6b43, #0f4a2e); color: white;">
+        <div style="font-size: 12px; opacity: 0.8; margin-bottom: 8px;">Total Users</div>
+        <div style="font-size: 28px; font-weight: 800;" id="admin-total-users">0</div>
+        <div style="font-size: 11px; opacity: 0.7;">Active: <span id="admin-active-users">0</span></div>
+      </div>
+      <div class="card" style="background: linear-gradient(135deg, #22884f, #1a6b43); color: white;">
+        <div style="font-size: 12px; opacity: 0.8; margin-bottom: 8px;">Total Savings</div>
+        <div style="font-size: 28px; font-weight: 800;" id="admin-total-savings">GHS 0</div>
+        <div style="font-size: 11px; opacity: 0.7;">Across all users</div>
+      </div>
+      <div class="card" style="background: linear-gradient(135deg, #c9920a, #b8860b); color: white;">
+        <div style="font-size: 12px; opacity: 0.8; margin-bottom: 8px;">Loan Requests</div>
+        <div style="font-size: 28px; font-weight: 800;" id="admin-total-loans">GHS 0</div>
+        <div style="font-size: 11px; opacity: 0.7;">Pending: <span id="admin-pending-loans">0</span></div>
+      </div>
+      <div class="card" style="background: linear-gradient(135deg, #c0392b, #991b1b); color: white;">
+        <div style="font-size: 12px; opacity: 0.8; margin-bottom: 8px;">Goals Completed</div>
+        <div style="font-size: 28px; font-weight: 800;" id="admin-completed-goals">0%</div>
+        <div style="font-size: 11px; opacity: 0.7;">Total: <span id="admin-total-goals">0</span></div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div style="display: flex; gap: 10px; margin-bottom: 24px; border-bottom: 2px solid var(--b); padding-bottom: 10px;">
+      <button class="admin-tab active" onclick="showAdminTab('users')">👥 Users</button>
+      <button class="admin-tab" onclick="showAdminTab('loans')">💰 Loan Requests</button>
+      <button class="admin-tab" onclick="showAdminTab('goals')">🎯 All Goals</button>
+      <button class="admin-tab" onclick="showAdminTab('transactions')">📊 Transactions</button>
+    </div>
+
+    <!-- Users Tab -->
+    <div id="admin-users-tab" class="admin-tab-content">
+      <div class="card">
+        <div class="ch">
+          <p class="ctg">All Registered Users</p>
+          <input type="text" id="admin-user-search" placeholder="Search users..." onkeyup="filterAdminUsers()" style="padding: 8px 12px; border: 1px solid var(--b); border-radius: 8px;">
+        </div>
+        <div style="overflow-x: auto;">
+          <table class="tbl">
+            <thead>
+              <tr><th>ID</th><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Goals</th><th>Savings</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="admin-users-table"><tr><td colspan="8"><div class="spin-wrap"><div class="spin"></div>Loading...</div></td></tr>
+            </tbody>
+           </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loans Tab -->
+    <div id="admin-loans-tab" class="admin-tab-content" style="display: none;">
+      <div class="card">
+        <div class="ch">
+          <p class="ctg">All Loan Requests</p>
+          <div>
+            <button class="filter-btn active" onclick="filterAdminLoans('all')">All</button>
+            <button class="filter-btn" onclick="filterAdminLoans('pending')">Pending</button>
+            <button class="filter-btn" onclick="filterAdminLoans('approved')">Approved</button>
+            <button class="filter-btn" onclick="filterAdminLoans('rejected')">Rejected</button>
+          </div>
+        </div>
+        <div style="overflow-x: auto;">
+          <table class="tbl">
+            <thead>
+              <tr><th>ID</th><th>User</th><th>Amount</th><th>Purpose</th><th>Status</th><th>Applied</th><th>Due Date</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="admin-loans-table"><tr><td colspan="8"><div class="spin-wrap"><div class="spin"></div>Loading...</div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Goals Tab -->
+    <div id="admin-goals-tab" class="admin-tab-content" style="display: none;">
+      <div class="card">
+        <p class="ctg">All Saving Goals</p>
+        <div style="overflow-x: auto;">
+          <table class="tbl">
+            <thead>
+              <tr><th>ID</th><th>User</th><th>Goal Name</th><th>Target</th><th>Saved</th><th>Progress</th><th>Deadline</th></tr>
+            </thead>
+            <tbody id="admin-goals-table"><tr><td colspan="7"><div class="spin-wrap"><div class="spin"></div>Loading...</div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Transactions Tab -->
+    <div id="admin-transactions-tab" class="admin-tab-content" style="display: none;">
+      <div class="card">
+        <p class="ctg">All Business Transactions</p>
+        <div style="overflow-x: auto;">
+          <table class="tbl">
+            <thead>
+              <tr><th>ID</th><th>User</th><th>Description</th><th>Type</th><th>Amount</th><th>Date</th></tr>
+            </thead>
+            <tbody id="admin-transactions-table"><tr><td colspan="6"><div class="spin-wrap"><div class="spin"></div>Loading...</div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -918,6 +1109,10 @@ let _loanFilter = 'all';
 let _bizChartType = 'bar';
 let _csChartType = 'line';
 
+// Admin variables
+let adminCurrentLoanFilter = 'all';
+let adminUsersData = [];
+
 /* ─── SIDEBAR ─── */
 function toggleSidebar(){
   document.getElementById('sb').classList.toggle('open');
@@ -948,6 +1143,12 @@ function go(page){
   _currentPage=page;
   load(page);
   startAutoRefresh(page);
+  
+  // Load admin data if on admin page
+  if(page === 'admin') {
+      loadAdminDashboard();
+      loadAdminUsers();
+  }
 }
 
 function startAutoRefresh(page){
@@ -1078,6 +1279,9 @@ function doLogin(){
       show('app');
       go('dashboard');
       toast('Welcome back, ' + USER.name + '!','success');
+      
+      // Check if user is admin
+      checkAdminStatus();
     } else {
       toast('Login failed - invalid credentials','error');
     }
@@ -1110,7 +1314,7 @@ async function api(ep, opts={}){
     console.log('API Call:', BASE+ep, opts.method || 'GET');
     const response = await fetch(BASE+ep, {
       headers: HDR,
-      credentials: 'include',  // ADD THIS LINE - important for sessions
+      credentials: 'include',
       ...opts,
       body: opts.body ? opts.body : undefined
     });
@@ -1150,6 +1354,234 @@ function load(page,silent=false){
 }
 
 /* ═══════════════════════════
+   ADMIN FUNCTIONS
+═══════════════════════════ */
+function showAdminTab(tabName) {
+    document.querySelectorAll('.admin-tab-content').forEach(tab => {
+        tab.style.display = 'none';
+    });
+    document.querySelectorAll('.admin-tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    document.getElementById(`admin-${tabName}-tab`).style.display = 'block';
+    event.target.classList.add('active');
+    
+    if (tabName === 'users') loadAdminUsers();
+    if (tabName === 'loans') loadAdminLoans();
+    if (tabName === 'goals') loadAdminGoals();
+    if (tabName === 'transactions') loadAdminTransactions();
+}
+
+async function refreshAdminData() {
+    await loadAdminDashboard();
+    await loadAdminUsers();
+    toast('Admin data refreshed!', 'success');
+}
+
+async function loadAdminDashboard() {
+    try {
+        const res = await fetch(BASE + '/admin/dashboard', { credentials: 'include' });
+        const data = await res.json();
+        document.getElementById('admin-total-users').textContent = data.users.total;
+        document.getElementById('admin-active-users').textContent = data.users.active;
+        document.getElementById('admin-total-savings').textContent = 'GHS ' + mf(data.finance.total_savings);
+        document.getElementById('admin-total-loans').textContent = 'GHS ' + mf(data.finance.total_loans_requested);
+        document.getElementById('admin-pending-loans').textContent = data.loans.pending;
+        document.getElementById('admin-completed-goals').textContent = data.goals.completion_rate + '%';
+        document.getElementById('admin-total-goals').textContent = data.goals.total;
+    } catch (err) {
+        console.error('Error loading admin dashboard:', err);
+    }
+}
+
+async function loadAdminUsers() {
+    try {
+        const res = await fetch(BASE + '/admin/users', { credentials: 'include' });
+        const users = await res.json();
+        adminUsersData = users;
+        const tbody = document.getElementById('admin-users-table');
+        tbody.innerHTML = users.map(user => `
+            <tr>
+                <td>${user.id}</td>
+                <td>${esc(user.name)}</td>
+                <td>${esc(user.email)}</td>
+                <td><span class="status-badge ${user.is_admin ? 'role-admin' : 'role-user'}">${user.is_admin ? 'Admin' : 'User'}</span></td>
+                <td><span class="status-badge ${user.status === 'active' ? 'status-active' : 'status-suspended'}">${user.status}</span></td>
+                <td>${user.goal_count || 0}</td>
+                <td>GHS ${mf(user.savings_total || 0)}</td>
+                <td>
+                    ${!user.is_admin ? `<button class="admin-action-btn btn-make-admin" onclick="makeAdmin(${user.id})">Make Admin</button>` : `<button class="admin-action-btn btn-suspend" onclick="removeAdmin(${user.id})">Remove Admin</button>`}
+                    ${user.status === 'active' ? `<button class="admin-action-btn btn-suspend" onclick="suspendUser(${user.id})">Suspend</button>` : `<button class="admin-action-btn btn-approve" onclick="activateUser(${user.id})">Activate</button>`}
+                    <button class="admin-action-btn btn-reject" onclick="deleteUser(${user.id})">Delete</button>
+                  </div>
+                </td>
+            </tr>
+        `).join('');
+    } catch (err) {
+        console.error('Error loading users:', err);
+    }
+}
+
+function filterAdminUsers() {
+    const search = document.getElementById('admin-user-search').value.toLowerCase();
+    const filtered = adminUsersData.filter(user => 
+        user.name.toLowerCase().includes(search) || 
+        user.email.toLowerCase().includes(search)
+    );
+    const tbody = document.getElementById('admin-users-table');
+    tbody.innerHTML = filtered.map(user => `
+        <tr>
+            <td>${user.id}</td>
+            <td>${esc(user.name)}</td>
+            <td>${esc(user.email)}</td>
+            <td><span class="status-badge ${user.is_admin ? 'role-admin' : 'role-user'}">${user.is_admin ? 'Admin' : 'User'}</span></td>
+            <td><span class="status-badge ${user.status === 'active' ? 'status-active' : 'status-suspended'}">${user.status}</span></td>
+            <td>${user.goal_count || 0}</td>
+            <td>GHS ${mf(user.savings_total || 0)}</td>
+            <td>
+                ${!user.is_admin ? `<button class="admin-action-btn btn-make-admin" onclick="makeAdmin(${user.id})">Make Admin</button>` : `<button class="admin-action-btn btn-suspend" onclick="removeAdmin(${user.id})">Remove Admin</button>`}
+                ${user.status === 'active' ? `<button class="admin-action-btn btn-suspend" onclick="suspendUser(${user.id})">Suspend</button>` : `<button class="admin-action-btn btn-approve" onclick="activateUser(${user.id})">Activate</button>`}
+                <button class="admin-action-btn btn-reject" onclick="deleteUser(${user.id})">Delete</button>
+              </div>
+            </td>
+        </tr>
+    `).join('');
+}
+
+async function makeAdmin(userId) {
+    if (confirm('Make this user an admin?')) {
+        const res = await fetch(`${BASE}/admin/users/${userId}/make-admin`, { method: 'PUT', credentials: 'include' });
+        if (res.ok) { toast('User is now an admin!', 'success'); loadAdminUsers(); }
+    }
+}
+
+async function removeAdmin(userId) {
+    if (confirm('Remove admin privileges from this user?')) {
+        const res = await fetch(`${BASE}/admin/users/${userId}/remove-admin`, { method: 'PUT', credentials: 'include' });
+        if (res.ok) { toast('Admin privileges removed', 'success'); loadAdminUsers(); }
+    }
+}
+
+async function suspendUser(userId) {
+    if (confirm('Suspend this user?')) {
+        const res = await fetch(`${BASE}/admin/users/${userId}/suspend`, { method: 'PUT', credentials: 'include' });
+        if (res.ok) { toast('User suspended', 'success'); loadAdminUsers(); }
+    }
+}
+
+async function activateUser(userId) {
+    const res = await fetch(`${BASE}/admin/users/${userId}/activate`, { method: 'PUT', credentials: 'include' });
+    if (res.ok) { toast('User activated', 'success'); loadAdminUsers(); }
+}
+
+async function deleteUser(userId) {
+    if (confirm('⚠️ WARNING: This will delete ALL user data. Are you sure?')) {
+        const res = await fetch(`${BASE}/admin/users/${userId}`, { method: 'DELETE', credentials: 'include' });
+        if (res.ok) { toast('User deleted', 'success'); loadAdminUsers(); loadAdminDashboard(); }
+    }
+}
+
+async function loadAdminLoans() {
+    try {
+        const res = await fetch(BASE + '/admin/loans', { credentials: 'include' });
+        let loans = await res.json();
+        if (adminCurrentLoanFilter !== 'all') {
+            loans = loans.filter(l => l.status === adminCurrentLoanFilter);
+        }
+        const tbody = document.getElementById('admin-loans-table');
+        tbody.innerHTML = loans.map(loan => `
+            <tr>
+                <td>${loan.id}</td>
+                <td>${esc(loan.user_name)}</td>
+                <td>GHS ${mf(loan.amount)}</td>
+                <td>${esc(loan.description || '-')}</td>
+                <td><span class="status-badge status-${loan.status}">${loan.status}</span></td>
+                <td>${fd(loan.created_at)}</td>
+                <td>${fd(loan.due_date)}</td>
+                <td>${loan.status === 'pending' ? `<button class="admin-action-btn btn-approve" onclick="approveLoan(${loan.id})">Approve</button><button class="admin-action-btn btn-reject" onclick="rejectLoan(${loan.id})">Reject</button>` : '-'}</td>
+            </tr>
+        `).join('');
+    } catch (err) { console.error('Error loading loans:', err); }
+}
+
+function filterAdminLoans(filter) {
+    adminCurrentLoanFilter = filter;
+    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    loadAdminLoans();
+}
+
+async function approveLoan(loanId) {
+    const res = await fetch(`${BASE}/admin/loans/${loanId}/approve`, { method: 'PUT', credentials: 'include' });
+    if (res.ok) { toast('Loan approved!', 'success'); loadAdminLoans(); loadAdminDashboard(); }
+}
+
+async function rejectLoan(loanId) {
+    const res = await fetch(`${BASE}/admin/loans/${loanId}/reject`, { method: 'PUT', credentials: 'include' });
+    if (res.ok) { toast('Loan rejected', 'info'); loadAdminLoans(); loadAdminDashboard(); }
+}
+
+async function loadAdminGoals() {
+    try {
+        const res = await fetch(BASE + '/admin/goals', { credentials: 'include' });
+        const goals = await res.json();
+        const tbody = document.getElementById('admin-goals-table');
+        tbody.innerHTML = goals.map(goal => {
+            const saved = goal.saved_amount || 0;
+            const target = parseFloat(goal.target_amount);
+            const pct = Math.min(100, Math.round(saved / target * 100));
+            return `<tr>
+                <td>${goal.id}</td>
+                <td>${esc(goal.user_name)}</td>
+                <td>${esc(goal.name)}</td>
+                <td>GHS ${mf(target)}</td>
+                <td>GHS ${mf(saved)}</td>
+                <td><div class="pb" style="width: 100px;"><div class="pbf" style="width: ${pct}%; background: var(--g);"></div></div>${pct}%</div></td>
+                <td>${fd(goal.deadline)}</td>
+            </tr>`;
+        }).join('');
+    } catch (err) { console.error('Error loading goals:', err); }
+}
+
+async function loadAdminTransactions() {
+    try {
+        const res = await fetch(BASE + '/admin/transactions', { credentials: 'include' });
+        const transactions = await res.json();
+        const tbody = document.getElementById('admin-transactions-table');
+        tbody.innerHTML = transactions.map(t => {
+            const isIncome = t.amount > 0;
+            return `<tr>
+                <td>${t.id}</td>
+                <td>${esc(t.user_name)}</td>
+                <td>${esc(t.description)}</td>
+                <td><span class="badge ${isIncome ? 'b-income' : 'b-expense'}">${isIncome ? 'Income' : 'Expense'}</span></td>
+                <td style="color: ${isIncome ? 'var(--g)' : 'var(--r)'}">${isIncome ? '+' : '-'}GHS ${mf(Math.abs(t.amount))}</div></td>
+                <td>${fd(t.transaction_date)}</div></td>
+            </tr>`;
+        }).join('');
+    } catch (err) { console.error('Error loading transactions:', err); }
+}
+
+function checkAdminStatus() {
+    fetch(BASE + '/check-session', { credentials: 'include' })
+        .then(res => res.json())
+        .then(data => {
+            if (data.is_admin) {
+                const sidebarNav = document.querySelector('.sbn');
+                const existingAdmin = document.querySelector('.nl[data-p="admin"]');
+                if (!existingAdmin) {
+                    const adminLink = document.createElement('a');
+                    adminLink.className = 'nl';
+                    adminLink.setAttribute('data-p', 'admin');
+                    adminLink.setAttribute('onclick', "go('admin')");
+                    adminLink.innerHTML = `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>Admin Panel`;
+                    sidebarNav.appendChild(adminLink);
+                }
+            }
+        });
+}
+
+/* ═══════════════════════════
    SAVING GOALS
 ═══════════════════════════ */
 const ICONS=['🏠','💻','📊','✈️','🎓','🚗','🏥','📱','💍','🛒','🌍','⚽'];
@@ -1158,7 +1590,7 @@ async function loadGoals(silent=false){
   if(!USER_ID) return;
   if(!silent){
     document.getElementById('sg-cards').innerHTML='<div class="spin-wrap" style="grid-column:1/-1"><div class="spin"></div>Loading goals...</div>';
-    document.getElementById('sg-tb').innerHTML='<tr><td colspan="6"><div class="spin-wrap"><div class="spin"></div></div></td></tr>';
+    document.getElementById('sg-tb').innerHTML='<tr><td colspan="6"><div class="spin-wrap"><div class="spin"></div></div>NonNull;
   }
   const [gRes,tRes]=await Promise.all([api('/saving-goals'),api('/saving-transactions')]);
   const goals=uw(gRes).filter(g => g.user_id == USER_ID);
@@ -1203,7 +1635,7 @@ async function loadGoals(silent=false){
 
   const tbody=document.getElementById('sg-tb');
   if(!goals.length){
-    tbody.innerHTML='<tr><td colspan="6" class="empty">No goals found.</td></tr>';
+    tbody.innerHTML='<tr><td colspan="6" class="empty">No goals found. </div></td>';
   } else {
     tbody.innerHTML=goals.map(g=>{
       const saved=savedMap[g.id]||0;
@@ -1212,23 +1644,23 @@ async function loadGoals(silent=false){
       const barColor=pct>=100?'var(--g)':pct<30?'var(--r)':'var(--gold)';
       const goalTitle = g.name || g.title || 'Goal';
       return `<tr>
-        <td style="font-weight:700">${esc(goalTitle)}</td>
-        <td>GHS ${mf(target)}</td>
-        <td style="color:var(--g);font-weight:700">GHS ${mf(saved)}</td>
+        <td style="font-weight:700">${esc(goalTitle)}</div></td>
+        <td>GHS ${mf(target)}</div></td>
+        <td style="color:var(--g);font-weight:700">GHS ${mf(saved)}</div></td>
         <td style="min-width:130px">
           <div style="display:flex;align-items:center;gap:8px">
             <div class="pb" style="flex:1;margin-top:0"><div class="pbf" style="width:${pct}%;background:${barColor}"></div></div>
             <span style="font-size:11.5px;font-weight:700;color:${barColor};min-width:32px">${pct}%</span>
           </div>
-        </td>
-        <td>${fd(g.deadline)}</td>
+         </div>
+        <td>${fd(g.deadline)}</div></td>
         <td>
           <div class="tbl-actions">
             <button class="btn-edit" onclick="openSaveTxn(${g.id},'${esc(goalTitle)}')">+ Save</button>
             <button class="btn-edit" onclick="openEditGoal(${g.id},'${esc(goalTitle)}',${target},'${g.deadline||''}')">Edit</button>
             <button class="btn-danger" onclick="confirmDelete('goal',${g.id})">Delete</button>
           </div>
-        </td>
+         </div>
       </tr>`;
     }).join('');
   }
@@ -1334,7 +1766,7 @@ async function loadLoans(silent=false){
   if(!USER_ID) return;
   if(!silent){
     document.getElementById('ln-list').innerHTML='<div class="spin-wrap"><div class="spin"></div>Loading loans...</div>';
-    document.getElementById('ln-tb').innerHTML='<tr><td colspan="5"><div class="spin-wrap"><div class="spin"></div></div></td></tr>';
+    document.getElementById('ln-tb').innerHTML='<tr><td colspan="5"><div class="spin-wrap"><div class="spin"></div></div>NonNull;
   }
   const [lRes,cRes]=await Promise.all([api('/loan-requests'),api('/credit-scores')]);
   _allLoans=uw(lRes).filter(l => l.user_id == USER_ID);
@@ -1388,18 +1820,18 @@ function renderLoanTable(){
   let loans=_allLoans;
   if(_loanFilter!=='all') loans=loans.filter(l=>(l.status||'').toLowerCase()===_loanFilter);
   if(!loans.length){
-    tbody.innerHTML='<tr><td colspan="5" class="empty">No loan history found.</td></tr>';
+    tbody.innerHTML='<tr><td colspan="5" class="empty">No loan history found. </div></td>';
     return;
   }
   tbody.innerHTML=loans.map(l=>{
     const amt=parseFloat(l.amount||0);
     const st=(l.status||'pending').toLowerCase();
     return `<tr>
-      <td style="font-weight:800">GHS ${mf(amt)}</td>
-      <td style="color:var(--t2)">${esc(l.description||l.purpose||'—')}</td>
-      <td><span class="badge b-${st}">${cap(st)}</span></td>
-      <td>${fd(l.created_at)}</td>
-      <td>${fd(l.due_date)}</td>
+      <td style="font-weight:800">GHS ${mf(amt)}</div></td>
+      <td style="color:var(--t2)">${esc(l.description||l.purpose||'—')}</div></td>
+      <td><span class="badge b-${st}">${cap(st)}</span></div></td>
+      <td>${fd(l.created_at)}</div></td>
+      <td>${fd(l.due_date)}</div></td>
     </tr>`;
   }).join('');
 }
@@ -1442,7 +1874,7 @@ async function doLoan(){
 ═══════════════════════════ */
 async function loadBiz(silent=false){
   if(!USER_ID) return;
-  if(!silent) document.getElementById('biz-tb').innerHTML='<tr><td colspan="5"><div class="spin-wrap"><div class="spin"></div></div></td></tr>';
+  if(!silent) document.getElementById('biz-tb').innerHTML='<tr><td colspan="5"><div class="spin-wrap"><div class="spin"></div></div>NonNull;
   const res=await api('/business-transactions');
   _allTxns=uw(res).filter(t => t.user_id == USER_ID);
 
@@ -1465,25 +1897,25 @@ function renderTxnTable(){
   if(_txnFilter==='income') list=list.filter(t=>parseFloat(t.amount||0)>=0);
   if(_txnFilter==='expense') list=list.filter(t=>parseFloat(t.amount||0)<0);
   if(!list.length){
-    tbody.innerHTML=`<tr><td colspan="5"><div class="empty"><span class="empty-icon">📊</span>No transactions${_txnFilter!=='all'?' of this type':''} yet.</div></td></tr>`;
+    tbody.innerHTML=`<tr><td colspan="5"><div class="empty"><span class="empty-icon">📊</span>No transactions${_txnFilter!=='all'?' of this type':''} yet.</div>NonNull`;
     return;
   }
   tbody.innerHTML=list.slice(0,50).map(t=>{
     const a=parseFloat(t.amount||0);
     const isN=a<0;
     return `<tr>
-      <td style="font-family:'DM Mono',monospace;font-size:12px">${fd(t.transaction_date||t.created_at)}</td>
-      <td>${esc(t.description||'—')}</td>
-      <td><span class="badge ${isN?'b-expense':'b-income'}">${isN?'Expense':'Income'}</span></td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px">${fd(t.transaction_date||t.created_at)}</div></td>
+      <td>${esc(t.description||'—')}</div></td>
+      <td><span class="badge ${isN?'b-expense':'b-income'}">${isN?'Expense':'Income'}</span></div></td>
       <td style="font-weight:800;color:${isN?'var(--r)':'var(--g)'}">
         ${isN?'−':'+'}GHS ${mf(Math.abs(a))}
-      </td>
+       </div>
       <td>
         <div class="tbl-actions">
           <button class="btn-edit" onclick="openEditTxn(${t.id||0},'${esc(t.description||'')}',${a},'${t.transaction_date||''}')">Edit</button>
           <button class="btn-danger" onclick="confirmDelete('txn',${t.id||0})">Delete</button>
         </div>
-      </td>
+       </div>
     </tr>`;
   }).join('');
 }
@@ -2030,3 +2462,5 @@ document.addEventListener('DOMContentLoaded',()=>{
   });
 });
 </script>
+</body>
+</html>
