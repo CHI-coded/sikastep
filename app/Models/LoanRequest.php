@@ -9,7 +9,14 @@ class LoanRequest extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'amount', 'status', 'due_date'];
+    protected $fillable = [
+        'user_id',
+        'amount',
+        'description',
+        'purpose',
+        'status',
+        'due_date'
+    ];
 
     public function user()
     {

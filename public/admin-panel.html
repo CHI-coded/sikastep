@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SikaStep Admin Panel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+/* ══════════ RESET & BASE ══════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Plus Jakarta Sans',sans-serif;background:#f0f4f2;color:#0d1f17;font-size:14px;line-height:1.55}
+a{text-decoration:none;color:inherit}
+ul{list-style:none}
+button,input,select{font-family:inherit;font-size:14px}
+.hidden{display:none!important}
+
+/* ══════════ VARIABLES ══════════ */
+:root{
+  --g:#1a6b43;--gd:#0f4a2e;--gm:#22884f;--gl:#e4f4ec;--gll:#f0f9f4;
+  --accent:#6effa6;
+  --r:#c0392b;--rl:#fdf0ef;
+  --gold:#c9920a;--goldf:#fff8e6;
+  --t:#0d1f17;--t2:#4a6357;--t3:#8dab9b;
+  --b:#d5e5dd;--b2:#eaf2ee;--bg:#f0f4f2;--w:#fff;
+  --sidebar-w:240px;--sidebar-w-collapsed:68px;
+  --rad:14px;--rad-sm:9px;
+  --sh:0 2px 12px rgba(15,74,46,.08);
+  --sh-hover:0 8px 28px rgba(15,74,46,.14);
+  --sh-card:0 1px 4px rgba(15,74,46,.07);
+  --topbar-h:60px;
+}
+
+/* ══════════ APP LAYOUT ══════════ */
+#app{display:flex;min-height:100vh}
+
+/* ══════════ SIDEBAR ══════════ */
+#sidebar{
+  width:var(--sidebar-w);
+  background:linear-gradient(185deg,#0a1f14 0%,var(--gd) 60%,#0d3d25 100%);
+  min-height:100vh;
+  position:fixed;top:0;left:0;
+  display:flex;flex-direction:column;
+  z-index:200;
+  transition:width .28s cubic-bezier(.4,0,.2,1);
+  overflow:hidden;
+  box-shadow:4px 0 24px rgba(0,0,0,.18);
+}
+#sidebar.collapsed{width:var(--sidebar-w-collapsed)}
+
+.sb-header{
+  display:flex;align-items:center;gap:12px;
+  padding:20px 18px 18px;
+  border-bottom:1px solid rgba(255,255,255,.08);
+  min-height:var(--topbar-h);
+  white-space:nowrap;overflow:hidden;
+}
+.sb-logo{
+  width:34px;height:34px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--gm),var(--gd));
+  border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;
+  box-shadow:0 4px 12px rgba(34,136,79,.4);
+}
+.sb-title{color:#fff;font-size:16px;font-weight:800;letter-spacing:-.2px;transition:opacity .2s}
+.sb-subtitle{color:rgba(255,255,255,.35);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;display:block;margin-top:1px;transition:opacity .2s}
+#sidebar.collapsed .sb-title,#sidebar.collapsed .sb-subtitle{opacity:0;pointer-events:none}
+
+.sb-nav{flex:1;padding:12px 0;overflow-y:auto;overflow-x:hidden}
+.sb-nav::-webkit-scrollbar{width:4px}
+.sb-nav::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:4px}
+
+.nav-item{
+  display:flex;align-items:center;gap:13px;
+  padding:12px 18px;
+  color:rgba(255,255,255,.55);font-size:13px;font-weight:600;
+  cursor:pointer;transition:all .18s;
+  border-left:3px solid transparent;
+  white-space:nowrap;overflow:hidden;
+  user-select:none;
+}
+.nav-item:hover{background:rgba(255,255,255,.07);color:rgba(255,255,255,.85)}
+.nav-item.active{background:rgba(255,255,255,.12);color:#fff;border-left-color:var(--accent)}
+.nav-item .ni{width:18px;height:18px;flex-shrink:0;opacity:.75}
+.nav-item.active .ni{opacity:1}
+.nav-label{transition:opacity .2s}
+#sidebar.collapsed .nav-label{opacity:0}
+.nav-badge{
+  margin-left:auto;background:var(--r);color:#fff;
+  font-size:10px;font-weight:700;padding:1px 7px;border-radius:99px;
+  transition:opacity .2s;flex-shrink:0;
+}
+#sidebar.collapsed .nav-badge{opacity:0}
+
+.sb-section{
+  padding:6px 18px 4px;
+  font-size:9.5px;font-weight:700;color:rgba(255,255,255,.25);
+  text-transform:uppercase;letter-spacing:.12em;margin-top:8px;
+  white-space:nowrap;transition:opacity .2s;
+}
+#sidebar.collapsed .sb-section{opacity:0}
+
+.sb-footer{
+  padding:16px 18px;
+  border-top:1px solid rgba(255,255,255,.08);
+  display:flex;align-items:center;gap:10px;
+  overflow:hidden;white-space:nowrap;
+}
+.sb-av{
+  width:32px;height:32px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,var(--accent),var(--gm));
+  color:var(--gd);font-size:11px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;
+}
+.sb-user-name{color:#fff;font-size:13px;font-weight:700;transition:opacity .2s}
+.sb-user-role{color:rgba(255,255,255,.35);font-size:10.5px;display:block;transition:opacity .2s}
+#sidebar.collapsed .sb-user-name,#sidebar.collapsed .sb-user-role{opacity:0}
+
+/* ══════════ TOPBAR ══════════ */
+#topbar{
+  position:fixed;top:0;left:var(--sidebar-w);right:0;height:var(--topbar-h);
+  background:rgba(240,244,242,.95);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--b);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 28px;z-index:100;
+  transition:left .28s cubic-bezier(.4,0,.2,1);
+}
+#topbar.expanded{left:var(--sidebar-w-collapsed)}
+
+.topbar-left{display:flex;align-items:center;gap:16px}
+.toggle-btn{
+  background:none;border:1.5px solid var(--b);border-radius:8px;
+  width:34px;height:34px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--t2);transition:all .15s;
+}
+.toggle-btn:hover{background:var(--gl);border-color:var(--g);color:var(--g)}
+.breadcrumb{font-size:13px;font-weight:700;color:var(--t2)}
+.breadcrumb span{color:var(--g)}
+
+.topbar-right{display:flex;align-items:center;gap:12px}
+.topbar-admin{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;color:var(--t2)}
+.topbar-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--gm),var(--gd));color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.btn-logout{
+  background:transparent;border:1.5px solid var(--b);border-radius:8px;
+  padding:7px 14px;font-size:12px;font-weight:700;color:var(--t2);
+  cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:6px;
+}
+.btn-logout:hover{background:var(--rl);border-color:var(--r);color:var(--r)}
+
+/* ══════════ MAIN CONTENT ══════════ */
+#main{
+  margin-left:var(--sidebar-w);
+  margin-top:var(--topbar-h);
+  flex:1;min-height:calc(100vh - var(--topbar-h));
+  transition:margin-left .28s cubic-bezier(.4,0,.2,1);
+  background:var(--bg);
+}
+#main.expanded{margin-left:var(--sidebar-w-collapsed)}
+
+.page-content{padding:28px;display:none;animation:pg-in .22s ease}
+.page-content.active{display:block}
+@keyframes pg-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+.page-header{margin-bottom:24px}
+.page-header h2{font-size:22px;font-weight:800;color:var(--t);letter-spacing:-.3px;margin-bottom:4px}
+.page-header p{font-size:13px;color:var(--t2)}
+
+/* ══════════ STAT CARDS ══════════ */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.stat-card{
+  background:#fff;border:1px solid var(--b);border-radius:var(--rad);
+  padding:20px 22px;box-shadow:var(--sh-card);
+  transition:transform .2s,box-shadow .2s;cursor:default;
+  position:relative;overflow:hidden;
+}
+.stat-card:hover{transform:translateY(-2px);box-shadow:var(--sh)}
+.stat-card::after{content:'';position:absolute;top:0;right:0;width:80px;height:80px;border-radius:50%;transform:translate(20px,-20px)}
+.stat-card:nth-child(1)::after{background:radial-gradient(circle,rgba(26,107,67,.06),transparent)}
+.stat-card:nth-child(2)::after{background:radial-gradient(circle,rgba(201,146,10,.06),transparent)}
+.stat-card:nth-child(3)::after{background:radial-gradient(circle,rgba(192,57,43,.05),transparent)}
+.stat-card:nth-child(4)::after{background:radial-gradient(circle,rgba(109,40,217,.05),transparent)}
+
+.stat-label{font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+.stat-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.si-g{background:var(--gll)}
+.si-gold{background:#fffbeb}
+.si-r{background:#fef2f2}
+.si-p{background:#f5f3ff}
+
+.stat-val{font-size:30px;font-weight:800;letter-spacing:-.5px;margin-bottom:4px}
+.stat-sub{font-size:12px;color:var(--t3);font-weight:600}
+.stat-trend{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;margin-top:6px}
+.trend-up{background:#d1fae5;color:#065f46}
+.trend-dn{background:#fee2e2;color:#991b1b}
+
+/* ══════════ CARDS & TABLES ══════════ */
+.card{background:#fff;border:1px solid var(--b);border-radius:var(--rad);padding:22px 24px;box-shadow:var(--sh-card);margin-bottom:20px}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.card-title{font-size:15px;font-weight:700;color:var(--t)}
+.card-sub{font-size:12px;color:var(--t3);margin-top:2px}
+.chart-wrap{position:relative;height:280px}
+
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{text-align:left;padding:10px 14px;color:var(--t2);font-weight:700;font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;border-bottom:2px solid var(--b);background:#fafcfb;white-space:nowrap}
+.tbl td{padding:13px 14px;border-bottom:1px solid var(--b2);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:#f8fbf9;transition:background .12s}
+.tbl-wrap{overflow-x:auto;border-radius:0 0 var(--rad) var(--rad)}
+.tbl-actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+
+/* ══════════ BADGES ══════════ */
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:700;padding:3px 10px;border-radius:99px;letter-spacing:.03em;white-space:nowrap}
+.badge::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor;opacity:.7}
+.b-green{background:#d1fae5;color:#065f46}
+.b-yellow{background:#fef3c7;color:#92400e}
+.b-red{background:#fee2e2;color:#991b1b}
+.b-blue{background:#dbeafe;color:#1e40af}
+.b-gray{background:#f1f5f9;color:#475569}
+
+/* ══════════ BUTTONS ══════════ */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;border:none;transition:all .15s;white-space:nowrap}
+.btn:active{transform:scale(.96)}
+.btn-primary{background:var(--gd);color:#fff;box-shadow:0 2px 6px rgba(15,74,46,.25)}
+.btn-primary:hover{background:var(--gm)}
+.btn-success{background:#059669;color:#fff}
+.btn-success:hover{background:#047857}
+.btn-danger{background:transparent;color:var(--r);border:1.5px solid #fca5a5}
+.btn-danger:hover{background:var(--rl);border-color:var(--r)}
+.btn-warn{background:transparent;color:#d97706;border:1.5px solid #fde68a}
+.btn-warn:hover{background:#fffbeb;border-color:#f59e0b}
+.btn-sm{padding:5px 10px;font-size:11px}
+.btn-outline{background:transparent;color:var(--g);border:1.5px solid var(--b)}
+.btn-outline:hover{background:var(--gl);border-color:var(--g)}
+
+/* ══════════ SEARCH & FILTERS ══════════ */
+.toolbar{display:flex;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+.search-wrap{position:relative;flex:1;min-width:200px;max-width:340px}
+.search-wrap input{width:100%;border:1.5px solid var(--b);border-radius:9px;padding:9px 14px 9px 38px;font-size:13px;color:var(--t);background:#fff;outline:none;transition:border-color .18s}
+.search-wrap input:focus{border-color:var(--g)}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--t3)}
+.filter-chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{padding:6px 14px;border-radius:99px;border:1.5px solid var(--b);background:#fff;font-size:12px;font-weight:700;color:var(--t2);cursor:pointer;transition:all .15s}
+.chip.active{background:var(--gd);color:#fff;border-color:var(--gd)}
+.chip:hover:not(.active){background:var(--gl);border-color:var(--g);color:var(--g)}
+
+/* ══════════ LOADING ══════════ */
+.spin-wrap{display:flex;align-items:center;justify-content:center;gap:10px;padding:32px;color:var(--t3);font-size:13px}
+.spin{width:20px;height:20px;border:2.5px solid var(--b);border-top-color:var(--g);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.empty-state{text-align:center;padding:40px;color:var(--t3)}
+.empty-state .icon{font-size:36px;margin-bottom:10px;display:block}
+.empty-state p{font-size:13px;font-style:italic}
+
+/* ══════════ TOAST ══════════ */
+.toast{position:fixed;bottom:28px;right:28px;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:600;z-index:9999;animation:toast-in .28s cubic-bezier(.34,1.56,.64,1);box-shadow:0 6px 24px rgba(0,0,0,.2);max-width:300px;display:flex;align-items:center;gap:10px;color:#fff}
+.toast-success{background:#065f46}
+.toast-error{background:#991b1b}
+.toast-info{background:#1e293b}
+@keyframes toast-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ══════════ CONFIRM MODAL ══════════ */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:5000;padding:24px;backdrop-filter:blur(4px);animation:fade-in .2s ease}
+@keyframes fade-in{from{opacity:0}to{opacity:1}}
+.modal-box{background:#fff;border-radius:16px;padding:28px;width:100%;max-width:380px;text-align:center;animation:pop-in .25s cubic-bezier(.34,1.56,.64,1)}
+@keyframes pop-in{from{opacity:0;transform:scale(.93)}to{opacity:1;transform:scale(1)}}
+.modal-icon{font-size:40px;margin-bottom:12px;display:block}
+.modal-box h4{font-size:17px;font-weight:800;margin-bottom:8px}
+.modal-box p{font-size:13px;color:var(--t2);margin-bottom:22px;line-height:1.6}
+.modal-actions{display:flex;gap:10px;justify-content:center}
+
+/* ══════════ LOGS ══════════ */
+.log-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.log-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--b2)}
+.log-item:last-child{border-bottom:none}
+.log-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.log-info{flex:1}
+.log-main{font-size:13px;font-weight:600;color:var(--t)}
+.log-meta{font-size:11.5px;color:var(--t3);margin-top:2px}
+.log-time{font-size:11px;color:var(--t3);font-family:'DM Mono',monospace;white-space:nowrap}
+
+/* ══════════ AVATAR ══════════ */
+.user-cell{display:flex;align-items:center;gap:10px}
+.uav{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--gm),var(--gd));color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+/* ══════════ OVERLAY FOR MOBILE ══════════ */
+.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:199;backdrop-filter:blur(2px)}
+.sb-overlay.vis{display:block}
+
+/* ══════════ RESPONSIVE ══════════ */
+@media(max-width:1100px){.stat-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:900px){
+  #sidebar{transform:translateX(-100%);width:var(--sidebar-w)!important}
+  #sidebar.mobile-open{transform:translateX(0)}
+  #topbar{left:0!important}
+  #main{margin-left:0!important}
+  .log-grid{grid-template-columns:1fr}
+}
+@media(max-width:640px){
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .page-content{padding:18px}
+  .topbar-admin .name-text{display:none}
+  #topbar{padding:0 18px}
+}
+@media(max-width:400px){
+  .stat-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- Sidebar overlay (mobile) -->
+<div class="sb-overlay" id="sb-overlay" onclick="closeMobileSidebar()"></div>
+
+<!-- ═══ SIDEBAR ═══ -->
+<aside id="sidebar">
+  <div class="sb-header">
+    <div class="sb-logo">🌱</div>
+    <div>
+      <div class="sb-title">SikaStep</div>
+      <span class="sb-subtitle">Admin Console</span>
+    </div>
+  </div>
+
+  <nav class="sb-nav">
+    <div class="sb-section">Overview</div>
+    <div class="nav-item active" data-tab="dashboard" onclick="goTab('dashboard')">
+      <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <span class="nav-label">Dashboard</span>
+    </div>
+
+    <div class="sb-section">Management</div>
+    <div class="nav-item" data-tab="users" onclick="goTab('users')">
+      <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+      <span class="nav-label">Users</span>
+    </div>
+    <div class="nav-item" data-tab="loans" onclick="goTab('loans')">
+      <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+      <span class="nav-label">Loans</span>
+      <span class="nav-badge" id="pending-badge" style="display:none">0</span>
+    </div>
+    <div class="nav-item" data-tab="goals" onclick="goTab('goals')">
+      <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+      <span class="nav-label">Goals</span>
+    </div>
+    <div class="nav-item" data-tab="transactions" onclick="goTab('transactions')">
+      <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+      <span class="nav-label">Transactions</span>
+    </div>
+
+    <div class="sb-section">System</div>
+    <div class="nav-item" data-tab="logs" onclick="goTab('logs')">
+      <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      <span class="nav-label">Activity Logs</span>
+    </div>
+  </nav>
+
+  <div class="sb-footer">
+    <div class="sb-av" id="sb-av">A</div>
+    <div>
+      <div class="sb-user-name" id="sb-name">Admin</div>
+      <span class="sb-user-role">Administrator</span>
+    </div>
+  </div>
+</aside>
+
+<!-- ═══ TOPBAR ═══ -->
+<header id="topbar">
+  <div class="topbar-left">
+    <button class="toggle-btn" id="toggle-btn" onclick="toggleSidebar()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <div class="breadcrumb">Admin / <span id="breadcrumb-tab">Dashboard</span></div>
+  </div>
+  <div class="topbar-right">
+    <div class="topbar-admin">
+      <div class="topbar-av" id="top-av">A</div>
+      <span class="name-text" id="top-name">Admin</span>
+    </div>
+    <button class="btn-logout" onclick="doLogout()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Logout
+    </button>
+  </div>
+</header>
+
+<!-- ═══ MAIN CONTENT ═══ -->
+<main id="main">
+
+  <!-- ── DASHBOARD TAB ── -->
+  <div class="page-content active" id="tab-dashboard">
+    <div class="page-header">
+      <h2>Dashboard Overview</h2>
+      <p>Platform statistics and activity summary</p>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="stat-label">
+          Total Users
+          <div class="stat-icon si-g">👥</div>
+        </div>
+        <div class="stat-val" id="s-users">—</div>
+        <div class="stat-sub" id="s-users-sub">Loading...</div>
+        <span class="stat-trend trend-up" id="s-users-trend" style="display:none"></span>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">
+          Total Savings
+          <div class="stat-icon si-gold">💰</div>
+        </div>
+        <div class="stat-val" id="s-savings">—</div>
+        <div class="stat-sub">Platform-wide</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">
+          Loans Requested
+          <div class="stat-icon si-r">🏦</div>
+        </div>
+        <div class="stat-val" id="s-loans">—</div>
+        <div class="stat-sub" id="s-loans-sub">Loading...</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">
+          Saving Goals
+          <div class="stat-icon si-p">🎯</div>
+        </div>
+        <div class="stat-val" id="s-goals">—</div>
+        <div class="stat-sub" id="s-goals-sub">Loading...</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:20px">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">User Growth</div>
+            <div class="card-sub">Monthly new registrations</div>
+          </div>
+        </div>
+        <div class="chart-wrap"><canvas id="growth-chart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Platform Split</div>
+            <div class="card-sub">Admins vs regular users</div>
+          </div>
+        </div>
+        <div class="chart-wrap" style="height:220px"><canvas id="split-chart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Recent activity preview -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
+      <div class="card">
+        <div class="card-header"><div class="card-title">⚡ Pending Loans</div></div>
+        <div id="dash-pending-loans"><div class="spin-wrap"><div class="spin"></div></div></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">🎯 Recent Goals</div></div>
+        <div id="dash-recent-goals"><div class="spin-wrap"><div class="spin"></div></div></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">👤 New Users</div></div>
+        <div id="dash-new-users"><div class="spin-wrap"><div class="spin"></div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── USERS TAB ── -->
+  <div class="page-content" id="tab-users">
+    <div class="page-header">
+      <h2>User Management</h2>
+      <p>View, search, and manage all platform users</p>
+    </div>
+    <div class="card">
+      <div class="toolbar">
+        <div class="search-wrap">
+          <span class="search-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+          <input type="text" id="user-search" placeholder="Search by name or email..." oninput="filterUsers()"/>
+        </div>
+        <div class="filter-chips">
+          <span class="chip active" data-filter="all" onclick="setUserFilter('all',this)">All</span>
+          <span class="chip" data-filter="active" onclick="setUserFilter('active',this)">Active</span>
+          <span class="chip" data-filter="suspended" onclick="setUserFilter('suspended',this)">Suspended</span>
+          <span class="chip" data-filter="admin" onclick="setUserFilter('admin',this)">Admins</span>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th>User</th><th>Email</th><th>Role</th><th>Status</th><th>Savings</th><th>Goals</th><th>Actions</th></tr></thead>
+          <tbody id="users-tb"><tr><td colspan="7"><div class="spin-wrap"><div class="spin"></div>Loading users...</div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── LOANS TAB ── -->
+  <div class="page-content" id="tab-loans">
+    <div class="page-header">
+      <h2>Loan Management</h2>
+      <p>Review, approve or reject loan applications</p>
+    </div>
+    <div class="card">
+      <div class="toolbar">
+        <div class="filter-chips" id="loan-filter-chips">
+          <span class="chip active" data-status="all" onclick="setLoanFilter('all',this)">All</span>
+          <span class="chip" data-status="pending" onclick="setLoanFilter('pending',this)">Pending</span>
+          <span class="chip" data-status="approved" onclick="setLoanFilter('approved',this)">Approved</span>
+          <span class="chip" data-status="rejected" onclick="setLoanFilter('rejected',this)">Rejected</span>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th>ID</th><th>User</th><th>Amount</th><th>Purpose</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+          <tbody id="loans-tb"><tr><td colspan="7"><div class="spin-wrap"><div class="spin"></div>Loading loans...</div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── GOALS TAB ── -->
+  <div class="page-content" id="tab-goals">
+    <div class="page-header">
+      <h2>Saving Goals</h2>
+      <p>All user saving goals and progress</p>
+    </div>
+    <div class="card">
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th>ID</th><th>User</th><th>Goal Name</th><th>Target</th><th>Saved</th><th>Progress</th><th>Deadline</th></tr></thead>
+          <tbody id="goals-tb"><tr><td colspan="7"><div class="spin-wrap"><div class="spin"></div>Loading goals...</div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TRANSACTIONS TAB ── -->
+  <div class="page-content" id="tab-transactions">
+    <div class="page-header">
+      <h2>Transactions</h2>
+      <p>All business income and expense records</p>
+    </div>
+    <div class="card">
+      <div class="toolbar">
+        <div class="filter-chips">
+          <span class="chip active" onclick="setTxnFilter('all',this)">All</span>
+          <span class="chip" onclick="setTxnFilter('income',this)">Income</span>
+          <span class="chip" onclick="setTxnFilter('expense',this)">Expense</span>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th>ID</th><th>User</th><th>Description</th><th>Type</th><th>Amount</th><th>Date</th></tr></thead>
+          <tbody id="txns-tb"><tr><td colspan="6"><div class="spin-wrap"><div class="spin"></div>Loading...</div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── LOGS TAB ── -->
+  <div class="page-content" id="tab-logs">
+    <div class="page-header">
+      <h2>Activity Logs</h2>
+      <p>Recent platform activity across all sections</p>
+    </div>
+    <div class="log-grid">
+      <div class="card">
+        <div class="card-header"><div class="card-title">👤 Recent Users</div></div>
+        <div id="log-users"><div class="spin-wrap"><div class="spin"></div></div></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">🎯 Recent Goals</div></div>
+        <div id="log-goals"><div class="spin-wrap"><div class="spin"></div></div></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">💵 Recent Loans</div></div>
+        <div id="log-loans"><div class="spin-wrap"><div class="spin"></div></div></div>
+      </div>
+    </div>
+  </div>
+
+</main>
+</div><!-- /app -->
+
+<!-- Toast -->
+<div id="toast-el" class="toast hidden"></div>
+
+<!-- Confirm Modal -->
+<div id="confirm-modal" class="modal-bg hidden">
+  <div class="modal-box">
+    <span class="modal-icon" id="c-icon">⚠️</span>
+    <h4 id="c-title">Confirm Action</h4>
+    <p id="c-msg">Are you sure?</p>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeConfirm()">Cancel</button>
+      <button class="btn" id="c-ok-btn" onclick="runConfirm()">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════
+   SIKASTEP ADMIN PANEL — JS
+   API: http://127.0.0.1:8000/api
+═══════════════════════════════════ */
+
+const BASE = 'http://127.0.0.1:8000/api';
+const HDR = {'Content-Type':'application/json','Accept':'application/json'};
+const CREDS = {credentials:'include'};
+
+let _currentTab = 'dashboard';
+let _confirmCb = null;
+let _loanConfirmResolve = null;
+let _charts = {};
+let _allUsers = [];
+let _allLoans = [];
+let _allTxns = [];
+let _userFilter = 'all';
+let _loanFilter = 'all';
+let _txnFilter = 'all';
+let _sidebarCollapsed = false;
+let _adminName = 'Admin';
+
+/* ══════ INIT ══════ */
+document.addEventListener('DOMContentLoaded', async () => {
+  await checkSession();
+});
+
+async function checkSession() {
+  try {
+    const r = await fetch(BASE + '/check-session', {...CREDS, headers: HDR});
+    const d = await r.json();
+    if (!d || !d.is_admin) {
+      window.location.href = 'admin-login.html';
+      return;
+    }
+    _adminName = d.name || d.user?.name || 'Admin';
+    setAdminUI();
+    goTab('dashboard');
+  } catch(e) {
+    // If check-session fails, still allow access (dev mode fallback)
+    console.warn('Session check failed, proceeding anyway:', e.message);
+    setAdminUI();
+    goTab('dashboard');
+  }
+}
+
+function setAdminUI() {
+  const initials = _adminName.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  document.getElementById('sb-av').textContent = initials;
+  document.getElementById('top-av').textContent = initials;
+  document.getElementById('sb-name').textContent = _adminName;
+  document.getElementById('top-name').textContent = _adminName;
+}
+
+/* ══════ SIDEBAR ══════ */
+function toggleSidebar() {
+  const isMobile = window.innerWidth <= 900;
+  if (isMobile) {
+    document.getElementById('sidebar').classList.toggle('mobile-open');
+    document.getElementById('sb-overlay').classList.toggle('vis');
+  } else {
+    _sidebarCollapsed = !_sidebarCollapsed;
+    document.getElementById('sidebar').classList.toggle('collapsed', _sidebarCollapsed);
+    document.getElementById('topbar').classList.toggle('expanded', _sidebarCollapsed);
+    document.getElementById('main').classList.toggle('expanded', _sidebarCollapsed);
+  }
+}
+function closeMobileSidebar() {
+  document.getElementById('sidebar').classList.remove('mobile-open');
+  document.getElementById('sb-overlay').classList.remove('vis');
+}
+
+/* ══════ NAVIGATION ══════ */
+function goTab(tab) {
+  document.querySelectorAll('.page-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  document.querySelector(`.nav-item[data-tab="${tab}"]`).classList.add('active');
+  document.getElementById('breadcrumb-tab').textContent = tab.charAt(0).toUpperCase() + tab.slice(1).replace('-',' ');
+  _currentTab = tab;
+  closeMobileSidebar();
+  loadTab(tab);
+}
+
+function loadTab(tab) {
+  const map = {
+    dashboard: loadDashboard,
+    users: loadUsers,
+    loans: loadLoans,
+    goals: loadGoals,
+    transactions: loadTransactions,
+    logs: loadLogs,
+  };
+  if (map[tab]) map[tab]();
+}
+
+/* ══════ API ══════ */
+async function api(ep, opts = {}) {
+  try {
+    const r = await fetch(BASE + ep, {headers: HDR, ...CREDS, ...opts});
+    if (!r.ok) { console.warn('[API]', ep, r.status); return null; }
+    return await r.json();
+  } catch(e) { console.warn('[API]', ep, e.message); return null; }
+}
+
+function uw(r) {
+  if (!r) return [];
+  if (Array.isArray(r)) return r;
+  if (Array.isArray(r.data)) return r.data;
+  if (r.data) return [r.data];
+  return [];
+}
+
+/* ══════ LOGOUT ══════ */
+async function doLogout() {
+  await api('/logout', {method:'POST'});
+  window.location.href = 'admin-login.html';
+}
+
+/* ══════ DASHBOARD ══════ */
+async function loadDashboard() {
+  const d = await api('/admin/dashboard');
+  if (!d) { toast('Could not load dashboard data', 'error'); return; }
+
+  // Stat cards
+  const users = d.users || {};
+  const finance = d.finance || {};
+  const goals = d.goals || {};
+  const loans = d.loans || {};
+
+  setText('s-users', users.total ?? '—');
+  setText('s-users-sub', `${users.active ?? 0} active · ${users.admins ?? 0} admins`);
+  setText('s-savings', finance.total_savings != null ? 'GHS ' + mf(finance.total_savings) : '—');
+  setText('s-loans', finance.total_loans_requested != null ? 'GHS ' + mf(finance.total_loans_requested) : '—');
+  setText('s-loans-sub', `${loans.pending ?? 0} pending`);
+  setText('s-goals', goals.total ?? '—');
+  setText('s-goals-sub', `${goals.completion_rate ?? 0}% completion rate`);
+
+  // Pending badge
+  const pb = document.getElementById('pending-badge');
+  if (loans.pending > 0) { pb.style.display = ''; pb.textContent = loans.pending; }
+
+  // User growth chart
+  destroyChart('growth-chart');
+  const gc = document.getElementById('growth-chart');
+  if (gc) {
+    const total = users.total || 10;
+    // Approximate growth curve ending at total
+    const growth = [
+      Math.round(total * .25), Math.round(total * .38),
+      Math.round(total * .52), Math.round(total * .65),
+      Math.round(total * .80), total
+    ];
+    _charts['growth-chart'] = new Chart(gc, {
+      type: 'line',
+      data: {
+        labels: ['Jan','Feb','Mar','Apr','May','Jun'],
+        datasets: [{
+          label: 'Users',
+          data: growth,
+          borderColor: '#22884f',
+          backgroundColor: 'rgba(34,136,79,.1)',
+          fill: true, tension: .4,
+          pointRadius: 5, pointHoverRadius: 8,
+          borderWidth: 2.5, pointBackgroundColor: '#22884f'
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {legend:{display:false}, tooltip:{callbacks:{label:c=>`${c.raw} users`}}},
+        scales: {
+          y: {beginAtZero:true, grid:{color:'#eaf2ee'}, ticks:{font:{size:10}, stepSize:1}},
+          x: {grid:{display:false}, ticks:{font:{size:10}}}
+        }
+      }
+    });
+  }
+
+  // Platform split donut
+  destroyChart('split-chart');
+  const sc = document.getElementById('split-chart');
+  if (sc) {
+    const admins = users.admins || 0;
+    const regular = (users.total || 0) - admins;
+    _charts['split-chart'] = new Chart(sc, {
+      type: 'doughnut',
+      data: {
+        labels: ['Regular Users', 'Admins'],
+        datasets: [{data: [regular, admins], backgroundColor: ['#22884f','#0f4a2e'], borderWidth: 0, hoverOffset: 8}]
+      },
+      options: {responsive:true, maintainAspectRatio:false, cutout:'65%',
+        plugins:{legend:{position:'bottom', labels:{boxWidth:12,padding:12,font:{size:11}}}}}
+    });
+  }
+
+  // Load activity previews
+  loadDashPreviews();
+}
+
+async function loadDashPreviews() {
+  // Pending loans
+  const lRes = await api('/admin/loans');
+  const loans = uw(lRes).filter(l => (l.status||'').toLowerCase() === 'pending').slice(0,4);
+  const plEl = document.getElementById('dash-pending-loans');
+  plEl.innerHTML = loans.length
+    ? loans.map(l => `<div class="log-item"><div class="log-dot" style="background:#f59e0b"></div><div class="log-info"><div class="log-main">${esc(l.user_name||'User')}</div><div class="log-meta">GHS ${mf(l.amount)} · ${esc(l.description||'—')}</div></div><button class="btn btn-success btn-sm" onclick="quickApprove(${l.id})">✓</button></div>`).join('')
+    : '<div class="empty-state"><span class="icon">✅</span><p>No pending loans</p></div>';
+
+  // Recent goals
+  const gRes = await api('/admin/goals');
+  const recentGoals = uw(gRes).slice(-4).reverse();
+  const rgEl = document.getElementById('dash-recent-goals');
+  rgEl.innerHTML = recentGoals.length
+    ? recentGoals.map(g => `<div class="log-item"><div class="log-dot" style="background:#6effa6"></div><div class="log-info"><div class="log-main">${esc(g.name||'Goal')}</div><div class="log-meta">${esc(g.user_name||'User')} · GHS ${mf(g.target_amount)}</div></div></div>`).join('')
+    : '<div class="empty-state"><span class="icon">🎯</span><p>No goals yet</p></div>';
+
+  // New users
+  const uRes = await api('/admin/users');
+  const newUsers = uw(uRes).slice(-4).reverse();
+  const nuEl = document.getElementById('dash-new-users');
+  nuEl.innerHTML = newUsers.length
+    ? newUsers.map(u => `<div class="log-item"><div class="uav" style="width:28px;height:28px;font-size:10px;flex-shrink:0">${(u.name||'?')[0].toUpperCase()}</div><div class="log-info"><div class="log-main">${esc(u.name||'—')}</div><div class="log-meta">${esc(u.email||'—')}</div></div><span class="badge ${u.is_admin?'b-blue':'b-green'}">${u.is_admin?'Admin':'User'}</span></div>`).join('')
+    : '<div class="empty-state"><span class="icon">👤</span><p>No users yet</p></div>';
+}
+
+async function quickApprove(id) {
+  const r = await api('/admin/loans/'+id+'/approve', {method:'PUT'});
+  if (r) { toast('Loan approved!', 'success'); loadDashboard(); }
+  else toast('Failed to approve', 'error');
+}
+
+/* ══════ USERS ══════ */
+async function loadUsers() {
+  document.getElementById('users-tb').innerHTML = '<tr><td colspan="7"><div class="spin-wrap"><div class="spin"></div>Loading...</div></td></tr>';
+  const res = await api('/admin/users');
+  _allUsers = uw(res);
+  renderUsers();
+}
+
+function setUserFilter(f, el) {
+  _userFilter = f;
+  document.querySelectorAll('#tab-users .chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  renderUsers();
+}
+
+function filterUsers() { renderUsers(); }
+
+function renderUsers() {
+  const q = (document.getElementById('user-search')?.value || '').toLowerCase();
+  let list = _allUsers;
+  if (_userFilter === 'active') list = list.filter(u => (u.status||'active') === 'active');
+  if (_userFilter === 'suspended') list = list.filter(u => u.status === 'suspended');
+  if (_userFilter === 'admin') list = list.filter(u => u.is_admin);
+  if (q) list = list.filter(u => (u.name||'').toLowerCase().includes(q) || (u.email||'').toLowerCase().includes(q));
+
+  const tbody = document.getElementById('users-tb');
+  if (!list.length) {
+    tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><span class="icon">👥</span><p>No users found</p></div></td></tr>';
+    return;
+  }
+  tbody.innerHTML = list.map(u => {
+    const status = u.status || 'active';
+    const isAdmin = u.is_admin;
+    const initials = (u.name||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    return `<tr>
+      <td><div class="user-cell"><div class="uav">${initials}</div><div><div style="font-weight:700">${esc(u.name||'—')}</div><div style="font-size:11px;color:var(--t3)">#${u.id}</div></div></div></td>
+      <td style="color:var(--t2);font-size:13px">${esc(u.email||'—')}</td>
+      <td><span class="badge ${isAdmin?'b-blue':'b-gray'}">${isAdmin?'Admin':'User'}</span></td>
+      <td><span class="badge ${status==='active'?'b-green':'b-red'}">${cap(status)}</span></td>
+      <td style="font-family:'DM Mono',monospace;font-size:12.5px;font-weight:700">GHS ${mf(u.savings_total||0)}</td>
+      <td style="color:var(--t2)">${u.goal_count||0}</td>
+      <td>
+        <div class="tbl-actions">
+          ${!isAdmin ? `<button class="btn btn-outline btn-sm" onclick="confirmAction('makeadmin',${u.id},'Make ${esc(u.name)} an admin?','This will grant full admin access.','🔑','btn-primary')">Make Admin</button>` : ''}
+          ${status==='active' ? `<button class="btn btn-warn btn-sm" onclick="confirmAction('suspend',${u.id},'Suspend ${esc(u.name)}?','This will suspend the user account.','⚠️','btn-warn')">Suspend</button>` : `<button class="btn btn-success btn-sm" onclick="confirmAction('activate',${u.id},'Activate ${esc(u.name)}?','This will restore access for the user.','✅','btn-success')">Activate</button>`}
+          <button class="btn btn-danger btn-sm" onclick="confirmAction('deleteuser',${u.id},'Delete ${esc(u.name)}?','This is permanent and cannot be undone.','🗑️','btn-danger')">Delete</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+/* ══════ LOANS ══════ */
+async function loadLoans() {
+  document.getElementById('loans-tb').innerHTML = '<tr><td colspan="7"><div class="spin-wrap"><div class="spin"></div>Loading...</div></td></tr>';
+  const res = await api('/admin/loans');
+  _allLoans = uw(res);
+  renderLoans();
+}
+
+function setLoanFilter(f, el) {
+  _loanFilter = f;
+  document.querySelectorAll('#loan-filter-chips .chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  renderLoans();
+}
+
+function renderLoans() {
+  let list = _allLoans;
+  if (_loanFilter !== 'all') list = list.filter(l => (l.status||'').toLowerCase() === _loanFilter);
+
+  const tbody = document.getElementById('loans-tb');
+  if (!list.length) {
+    tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><span class="icon">💵</span><p>No loans found</p></div></td></tr>';
+    return;
+  }
+  tbody.innerHTML = list.map(l => {
+    const status = (l.status||'pending').toLowerCase();
+    const isPending = status === 'pending';
+    return `<tr>
+      <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--t3)">#${l.id}</td>
+      <td style="font-weight:700">${esc(l.user_name||'—')}</td>
+      <td style="font-weight:800;font-family:'DM Mono',monospace">GHS ${mf(l.amount||0)}</td>
+      <td style="color:var(--t2);max-width:180px"><div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(l.description||l.purpose||'—')}</div></td>
+      <td><span class="badge ${status==='approved'?'b-green':status==='rejected'?'b-red':'b-yellow'}">${cap(status)}</span></td>
+      <td style="font-size:12px;color:var(--t2)">${fd(l.created_at)}</td>
+      <td>
+        <div class="tbl-actions">
+          ${isPending ? `
+            <button class="btn btn-success btn-sm" onclick="approveLoan(${l.id})">✓ Approve</button>
+            <button class="btn btn-danger btn-sm" onclick="rejectLoan(${l.id})">✕ Reject</button>
+          ` : `<span style="font-size:11.5px;color:var(--t3)">${cap(status)}</span>`}
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+async function approveLoan(id) {
+  const confirmed = await showLoanConfirm(
+    'Approve this loan?',
+    'This will mark the loan as approved and notify the user.',
+    '✅',
+    'Approve',
+    'btn-success'
+  );
+  if (!confirmed) return;
+  const r = await api(`/admin/loans/${id}/approve`, {method:'PUT', credentials:'include'});
+  if (r) {
+    toast('Loan approved successfully', 'success');
+    loadLoans();
+    loadDashboard();
+  } else {
+    toast('Failed to approve loan — check API', 'error');
+  }
+}
+
+async function rejectLoan(id) {
+  const confirmed = await showLoanConfirm(
+    'Reject this loan?',
+    'This will mark the loan as rejected. This action cannot be undone.',
+    '❌',
+    'Reject',
+    'btn-danger'
+  );
+  if (!confirmed) return;
+  const r = await api(`/admin/loans/${id}/reject`, {method:'PUT', credentials:'include'});
+  if (r) {
+    toast('Loan rejected', 'info');
+    loadLoans();
+    loadDashboard();
+  } else {
+    toast('Failed to reject loan — check API', 'error');
+  }
+}
+
+function showLoanConfirm(title, msg, icon, okLabel, okClass) {
+  return new Promise(resolve => {
+    document.getElementById('c-icon').textContent = icon;
+    document.getElementById('c-title').textContent = title;
+    document.getElementById('c-msg').textContent = msg;
+    const okBtn = document.getElementById('c-ok-btn');
+    okBtn.className = 'btn ' + okClass;
+    okBtn.textContent = okLabel;
+    document.getElementById('confirm-modal').classList.remove('hidden');
+
+    // Temporarily override runConfirm for this call
+    _loanConfirmResolve = resolve;
+  });
+}
+
+async function loanAction(id, action) {
+  const r = await api(`/admin/loans/${id}/${action}`, {method:'PUT'});
+  if (r) { toast(`Loan ${action}d successfully`, 'success'); loadLoans(); loadDashboard(); }
+  else toast(`Failed to ${action} loan`, 'error');
+}
+
+/* ══════ GOALS ══════ */
+async function loadGoals() {
+  document.getElementById('goals-tb').innerHTML = '<tr><td colspan="7"><div class="spin-wrap"><div class="spin"></div>Loading...</div></td></tr>';
+  const res = await api('/admin/goals');
+  const list = uw(res);
+
+  const tbody = document.getElementById('goals-tb');
+  if (!list.length) {
+    tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><span class="icon">🎯</span><p>No goals found</p></div></td></tr>';
+    return;
+  }
+  tbody.innerHTML = list.map(g => {
+    const saved = parseFloat(g.saved_amount||0);
+    const target = parseFloat(g.target_amount||1);
+    const pct = Math.min(100, Math.round(saved/target*100));
+    const barColor = pct>=100?'#22884f':pct<30?'#c0392b':'#f59e0b';
+    return `<tr>
+      <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--t3)">#${g.id}</td>
+      <td style="font-weight:700">${esc(g.user_name||'—')}</td>
+      <td style="font-weight:600">${esc(g.name||'—')}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12.5px">GHS ${mf(target)}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12.5px;color:var(--g);font-weight:700">GHS ${mf(saved)}</td>
+      <td style="min-width:160px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="flex:1;height:6px;background:var(--b2);border-radius:99px;overflow:hidden">
+            <div style="width:${pct}%;height:100%;background:${barColor};border-radius:99px;transition:width 1s"></div>
+          </div>
+          <span style="font-size:11.5px;font-weight:800;color:${barColor};min-width:34px">${pct}%</span>
+        </div>
+      </td>
+      <td style="font-size:12.5px;color:var(--t2)">${fd(g.deadline)}</td>
+    </tr>`;
+  }).join('');
+}
+
+/* ══════ TRANSACTIONS ══════ */
+async function loadTransactions() {
+  document.getElementById('txns-tb').innerHTML = '<tr><td colspan="6"><div class="spin-wrap"><div class="spin"></div>Loading...</div></td></tr>';
+  const res = await api('/admin/transactions');
+  _allTxns = uw(res);
+  renderTxns();
+}
+
+function setTxnFilter(f, el) {
+  _txnFilter = f;
+  document.querySelectorAll('#tab-transactions .chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  renderTxns();
+}
+
+function renderTxns() {
+  let list = _allTxns;
+  if (_txnFilter === 'income') list = list.filter(t => parseFloat(t.amount||0) > 0 || t.type === 'income');
+  if (_txnFilter === 'expense') list = list.filter(t => parseFloat(t.amount||0) < 0 || t.type === 'expense');
+
+  const tbody = document.getElementById('txns-tb');
+  if (!list.length) {
+    tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><span class="icon">📊</span><p>No transactions found</p></div></td></tr>';
+    return;
+  }
+  tbody.innerHTML = list.slice(0,50).map(t => {
+    const amt = parseFloat(t.amount||0);
+    const isIncome = t.type === 'income' || amt > 0;
+    return `<tr>
+      <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--t3)">#${t.id}</td>
+      <td style="font-weight:700">${esc(t.user_name||'—')}</td>
+      <td style="color:var(--t2)">${esc(t.description||'—')}</td>
+      <td><span class="badge ${isIncome?'b-green':'b-red'}">${isIncome?'Income':'Expense'}</span></td>
+      <td style="font-family:'DM Mono',monospace;font-size:13px;font-weight:800;color:${isIncome?'var(--g)':'var(--r)'}">
+        ${isIncome?'+':'−'}GHS ${mf(Math.abs(amt))}
+      </td>
+      <td style="font-size:12px;color:var(--t2)">${fd(t.transaction_date||t.created_at)}</td>
+    </tr>`;
+  }).join('');
+}
+
+/* ══════ LOGS ══════ */
+async function loadLogs() {
+  const res = await api('/admin/logs');
+  const d = res || {};
+
+  const recentUsers = d.recent_users || [];
+  const recentGoals = d.recent_goals || [];
+  const recentLoans = d.recent_loans || [];
+
+  const luEl = document.getElementById('log-users');
+  luEl.innerHTML = recentUsers.length
+    ? recentUsers.map(u => `<div class="log-item"><div class="log-dot" style="background:#22884f"></div><div class="log-info"><div class="log-main">${esc(u.name||u.email||'—')}</div><div class="log-meta">${esc(u.email||'—')}</div></div><div class="log-time">${fd(u.created_at||u.joined)}</div></div>`).join('')
+    : '<div class="empty-state"><span class="icon">👤</span><p>No recent users</p></div>';
+
+  const lgEl = document.getElementById('log-goals');
+  lgEl.innerHTML = recentGoals.length
+    ? recentGoals.map(g => `<div class="log-item"><div class="log-dot" style="background:#6effa6"></div><div class="log-info"><div class="log-main">${esc(g.name||'—')}</div><div class="log-meta">User #${g.user_id||'?'}</div></div><div class="log-time">${fd(g.created_at)}</div></div>`).join('')
+    : '<div class="empty-state"><span class="icon">🎯</span><p>No recent goals</p></div>';
+
+  const llEl = document.getElementById('log-loans');
+  llEl.innerHTML = recentLoans.length
+    ? recentLoans.map(l => `<div class="log-item"><div class="log-dot" style="background:${l.status==='approved'?'#22884f':l.status==='rejected'?'#c0392b':'#f59e0b'}"></div><div class="log-info"><div class="log-main">Loan #${l.id} · GHS ${mf(l.amount||0)}</div><div class="log-meta"><span class="badge ${l.status==='approved'?'b-green':l.status==='rejected'?'b-red':'b-yellow'}">${cap(l.status||'pending')}</span></div></div><div class="log-time">${fd(l.created_at)}</div></div>`).join('')
+    : '<div class="empty-state"><span class="icon">💵</span><p>No recent loans</p></div>';
+}
+
+/* ══════ CONFIRM ACTIONS ══════ */
+function confirmAction(type, id, title, msg, icon, btnClass) {
+  _confirmCb = {type, id};
+  document.getElementById('c-icon').textContent = icon;
+  document.getElementById('c-title').textContent = title;
+  document.getElementById('c-msg').textContent = msg;
+  const okBtn = document.getElementById('c-ok-btn');
+  okBtn.className = 'btn ' + btnClass;
+  okBtn.textContent = 'Confirm';
+  document.getElementById('confirm-modal').classList.remove('hidden');
+}
+function closeConfirm() {
+  document.getElementById('confirm-modal').classList.add('hidden');
+  if (_loanConfirmResolve) { _loanConfirmResolve(false); _loanConfirmResolve = null; }
+  _confirmCb = null;
+}
+async function runConfirm() {
+  // Handle loan promise-based confirm
+  if (_loanConfirmResolve) {
+    const resolve = _loanConfirmResolve;
+    _loanConfirmResolve = null;
+    document.getElementById('confirm-modal').classList.add('hidden');
+    resolve(true);
+    return;
+  }
+  if (!_confirmCb) return closeConfirm();
+  const {type, id} = _confirmCb;
+  closeConfirm();
+  let ep = '', method = 'PUT';
+  if (type === 'makeadmin')  ep = `/admin/users/${id}/make-admin`;
+  if (type === 'suspend')    ep = `/admin/users/${id}/suspend`;
+  if (type === 'activate')   ep = `/admin/users/${id}/activate`;
+  if (type === 'deleteuser') { ep = `/admin/users/${id}`; method = 'DELETE'; }
+  const r = await api(ep, {method});
+  if (r !== null) { toast('Action completed successfully', 'success'); loadUsers(); }
+  else toast('Action failed — check API', 'error');
+}
+
+/* ══════ CHART HELPERS ══════ */
+function destroyChart(id) {
+  if (_charts[id]) { try { _charts[id].destroy(); } catch(e) {} delete _charts[id]; }
+}
+
+/* ══════ TOAST ══════ */
+function toast(msg, type='info', ms=3400) {
+  const el = document.getElementById('toast-el');
+  el.className = `toast toast-${type}`;
+  el.innerHTML = `<span>${{success:'✓',error:'✕',info:'ℹ'}[type]||'ℹ'}</span><span>${msg}</span>`;
+  el.classList.remove('hidden');
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.add('hidden'), ms);
+}
+
+/* ══════ UTILS ══════ */
+function setText(id, val) { const el = document.getElementById(id); if (el) el.textContent = val; }
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+function cap(s) { return String(s||'').charAt(0).toUpperCase() + String(s||'').slice(1); }
+function mf(n) { return parseFloat(n||0).toLocaleString('en-GH',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function fd(d) {
+  if (!d) return '—';
+  const dt = new Date(d); if (isNaN(dt)) return '—';
+  return dt.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+}
+
+Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
+Chart.defaults.color = '#4a6357';
+
+document.addEventListener('keydown', e => { if(e.key === 'Escape') closeConfirm(); });
+</script>
+</body>
+</html>
