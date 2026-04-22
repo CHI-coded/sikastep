@@ -31,6 +31,8 @@ RUN sed -i 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available
 
 RUN php artisan migrate --force
 
+RUN php artisan migrate:status
+
 EXPOSE 8080
 
 CMD ["apache2-foreground"]
