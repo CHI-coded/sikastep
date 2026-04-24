@@ -29,9 +29,15 @@ RUN a2enmod rewrite
 
 RUN sed -i 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/000-default.conf
 
+# Clear and cache config
+RUN php artisan config:clear
+RUN php artisan cache:clear
+RUN php artisan view:clear
+RUN php artisan route:clear
+RUN php artisan config:cache
+RUN php artisan route:cache
+RUN php artisan view:cache
 RUN php artisan migrate --force
-
-RUN php artisan migrate:status
 
 EXPOSE 8080
 
