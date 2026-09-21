@@ -24,3 +24,12 @@ Route::get('/test-session', function() {
     }
     return response()->json(['logged_in' => false]);
 });
+
+Route::get('/debug', function() {
+    return response()->json([
+        'env_loaded' => env('APP_ENV'),
+        'db_connected' => function_exists('DB::connection'),
+        'storage_writable' => is_writable(storage_path()),
+        'logs_writable' => is_writable(storage_path('logs')),
+    ]);
+});
